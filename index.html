@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Watch, upload, and explore hundreds of trending videos on Video Playground. Premium responsive dark-mode video platform.">
+    <meta name="keywords" content="video streaming, video playground, trailer, watch videos, streaming platform">
+    <meta property="og:title" content="Video Playground - Ultimate Streaming Platform">
+    <meta property="og:description" content="Discover, search and stream over 200+ high quality videos in dark mode.">
+    <meta property="og:type" content="website">
+    <title>Video Playground - Streaming Platform</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/tailwind-config.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-primary selection:text-white">
+
+    <div id="topBannerAdContainer" class="hidden w-full bg-dark-card border-b border-dark-border py-2 px-4 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-1 shrink-0">
+                <i class="fa-solid fa-rectangle-ad text-brand-accent"></i> Advertisement
+            </div>
+            <div id="adTopHost" class="flex-1 w-full min-w-0 flex flex-col items-center gap-2 overflow-hidden"></div>
+            <button onclick="dismissTopBanner()" class="text-gray-400 hover:text-white text-xs p-1 rounded-full transition shrink-0" title="Close Ad">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-dark-border shadow-2xl transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+
+                <div class="flex items-center space-x-3 shrink-0">
+                    <a href="#" onclick="switchView('client')" class="flex items-center gap-2 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary via-purple-600 to-brand-accent flex items-center justify-center shadow-lg shadow-brand-primary/30 group-hover:scale-105 transition-transform duration-300">
+                            <i class="fa-solid fa-play text-white text-lg ml-0.5"></i>
+                        </div>
+                        <span class="font-black text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-indigo-300">
+                            VIDEO<span class="text-brand-primary">PLAYGROUND</span>
+                        </span>
+                    </a>
+                </div>
+
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-4 text-sm font-medium">
+                    <a href="#" onclick="filterByCategory('All'); switchView('client')" class="nav-link text-white hover:text-brand-primary transition-colors py-2 px-3 rounded-lg hover:bg-dark-hover">Home</a>
+                    <a href="#" onclick="sortVideos('latest'); switchView('client')" class="nav-link text-gray-300 hover:text-brand-primary transition-colors py-2 px-3 rounded-lg hover:bg-dark-hover">Latest</a>
+                    <a href="#" onclick="sortVideos('popular'); switchView('client')" class="nav-link text-gray-300 hover:text-brand-primary transition-colors py-2 px-3 rounded-lg hover:bg-dark-hover">Popular</a>
+                    <a href="#categoriesSection" onclick="switchView('client')" class="nav-link text-gray-300 hover:text-brand-primary transition-colors py-2 px-3 rounded-lg hover:bg-dark-hover">Categories</a>
+                    <button onclick="switchView('admin')" class="text-indigo-400 hover:text-indigo-300 transition-colors py-2 px-3 rounded-lg hover:bg-indigo-950/40 flex items-center gap-1.5 font-semibold">
+                        <i class="fa-solid fa-lock text-xs"></i> Admin Portal
+                    </button>
+                </nav>
+
+                <div class="flex-1 max-w-md hidden sm:block">
+                    <div class="relative">
+                        <input type="text" id="searchInput" oninput="handleSearchInput(event)" placeholder="Search 200+ videos, categories..." class="w-full bg-dark-card text-gray-200 text-sm rounded-full pl-10 pr-10 py-2 border border-dark-border focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition shadow-inner">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400 text-sm"></i>
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-gray-400 hover:text-white text-xs">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="openUploadModal()" class="bg-gradient-to-r from-brand-primary to-brand-hover hover:from-brand-hover hover:to-indigo-700 text-white font-medium text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 flex items-center gap-2 transition duration-200 transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                        <span class="hidden xs:inline">Upload Video</span>
+                    </button>
+
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-gray-300 hover:text-white p-2 rounded-lg hover:bg-dark-hover transition focus:outline-none">
+                        <i id="hamburgerIcon" class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="hidden md:hidden border-t border-dark-border bg-dark-surface px-4 pt-3 pb-5 space-y-3">
+            <div class="relative mb-3">
+                <input type="text" id="mobileSearchInput" oninput="handleSearchInput(event)" placeholder="Search videos..." class="w-full bg-dark-card text-gray-200 text-sm rounded-lg pl-9 pr-8 py-2 border border-dark-border focus:outline-none focus:border-brand-primary">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-xs"></i>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+                <a href="#" onclick="filterByCategory('All'); toggleMobileMenu(); switchView('client')" class="block px-3 py-2 rounded-lg text-gray-200 hover:bg-dark-card"><i class="fa-solid fa-house mr-2 text-brand-primary"></i> Home</a>
+                <a href="#" onclick="sortVideos('latest'); toggleMobileMenu(); switchView('client')" class="block px-3 py-2 rounded-lg text-gray-200 hover:bg-dark-card"><i class="fa-solid fa-fire mr-2 text-brand-pink"></i> Latest</a>
+                <a href="#" onclick="sortVideos('popular'); toggleMobileMenu(); switchView('client')" class="block px-3 py-2 rounded-lg text-gray-200 hover:bg-dark-card"><i class="fa-solid fa-chart-line mr-2 text-brand-accent"></i> Popular</a>
+                <button onclick="switchView('admin'); toggleMobileMenu();" class="text-left px-3 py-2 rounded-lg text-indigo-400 hover:bg-indigo-950/40"><i class="fa-solid fa-shield-halved mr-2"></i> Admin Portal</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="clientView" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <section id="heroCarouselSection" class="relative rounded-2xl overflow-hidden glass-panel border border-dark-border shadow-2xl group">
+            <div id="heroSliderContainer" class="relative w-full h-[380px] sm:h-[460px] lg:h-[520px]">
+            </div>
+
+            <button onclick="prevHeroSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full glass-panel hover:bg-brand-primary text-white flex items-center justify-center transition shadow-lg opacity-80 hover:opacity-100 z-20">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
+            </button>
+            <button onclick="nextHeroSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full glass-panel hover:bg-brand-primary text-white flex items-center justify-center transition shadow-lg opacity-80 hover:opacity-100 z-20">
+                <i class="fa-solid fa-chevron-right text-lg"></i>
+            </button>
+
+            <div id="heroDots" class="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center space-x-2 z-20">
+            </div>
+        </section>
+
+        <section id="categoriesSection" class="space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                <div id="categoryPillsContainer" class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1 pr-2">
+                </div>
+
+                <div class="flex items-center space-x-2 shrink-0 self-end md:self-auto">
+                    <label for="sortDropdown" class="text-xs text-gray-400 uppercase font-semibold tracking-wider whitespace-nowrap">Sort By:</label>
+                    <select id="sortDropdown" onchange="handleSortChange(this.value)" class="bg-dark-card text-gray-200 text-xs sm:text-sm rounded-xl px-3 py-2 border border-dark-border focus:outline-none focus:border-brand-primary transition cursor-pointer">
+                        <option value="latest">Latest Released</option>
+                        <option value="popular">Most Viewed</option>
+                        <option value="az">Title (A - Z)</option>
+                        <option value="duration">Longest Duration</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-gray-400 px-1">
+                <div id="filterSummaryText">Showing <span id="displayedCountText" class="text-white font-bold">24</span> of <span id="totalMatchCountText" class="text-white font-bold">200</span> videos</div>
+                <div id="activeCategoryBadge" class="hidden text-brand-accent font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-filter text-[10px]"></i> Active Filter Applied
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-8">
+            <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            </div>
+
+            <div class="flex flex-col items-center justify-center pt-4 pb-8 space-y-3">
+                <button id="loadMoreBtn" onclick="loadMoreVideos()" class="bg-dark-card hover:bg-dark-hover text-white border border-dark-border hover:border-brand-primary font-semibold text-sm py-3 px-8 rounded-xl shadow-lg transition duration-200 flex items-center gap-2 group">
+                    <span>Load More Videos</span>
+                    <i class="fa-solid fa-spinner animate-spin hidden" id="loadMoreSpinner"></i>
+                    <i class="fa-solid fa-angles-down group-hover:translate-y-0.5 transition-transform"></i>
+                </button>
+                <span id="noMoreVideosMsg" class="hidden text-xs text-gray-500 font-medium">You've reached the end of the video catalog.</span>
+            </div>
+        </section>
+
+    </main>
+
+    <main id="adminView" class="hidden flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-dark-surface p-6 rounded-2xl border border-dark-border shadow-xl">
+            <div>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="fa-solid fa-shield-halved text-brand-primary"></i> Admin Management Portal
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">Manage videos, hero sliders, security credentials & Adastra advertisement slots.</p>
+                <button type="button" id="serverSyncBadge" onclick="serverPush(true)" class="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border bg-amber-500/15 text-amber-300 border-amber-500/30" title="Click to save to the server now">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span>Checking server...</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openUploadModal()" class="bg-brand-primary hover:bg-brand-hover text-white text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl shadow flex items-center gap-2 transition">
+                    <i class="fa-solid fa-plus"></i> Upload Video
+                </button>
+                <button onclick="lockAdmin()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 text-xs sm:text-sm font-semibold py-2.5 px-3 rounded-xl flex items-center gap-1.5 transition" title="Lock Admin Portal">
+                    <i class="fa-solid fa-lock"></i> Lock
+                </button>
+                <button onclick="switchView('client')" class="bg-dark-card hover:bg-dark-hover text-gray-300 text-xs sm:text-sm font-semibold py-2.5 px-4 rounded-xl border border-dark-border flex items-center gap-2 transition">
+                    <i class="fa-solid fa-arrow-left"></i> Exit to Site
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 border-b border-dark-border pb-3 overflow-x-auto no-scrollbar">
+            <button onclick="switchAdminTab('dashboard')" id="tabBtnDashboard" class="admin-tab-btn py-2 px-4 rounded-xl font-semibold text-xs transition bg-brand-primary text-white">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+            </button>
+            <button onclick="switchAdminTab('videos')" id="tabBtnVideos" class="admin-tab-btn py-2 px-4 rounded-xl font-semibold text-xs transition text-gray-400 hover:text-white hover:bg-dark-card">
+                <i class="fa-solid fa-film mr-1.5"></i> Video Management
+            </button>
+            <button onclick="switchAdminTab('ads')" id="tabBtnAds" class="admin-tab-btn py-2 px-4 rounded-xl font-semibold text-xs transition text-gray-400 hover:text-white hover:bg-dark-card">
+                <i class="fa-solid fa-rectangle-ad mr-1.5"></i> Adastra Ad Manager
+            </button>
+            <button onclick="switchAdminTab('settings')" id="tabBtnSettings" class="admin-tab-btn py-2 px-4 rounded-xl font-semibold text-xs transition text-gray-400 hover:text-white hover:bg-dark-card">
+                <i class="fa-solid fa-gear mr-1.5"></i> Settings & Security
+            </button>
+        </div>
+
+        <div id="adminTabDashboard" class="admin-tab-content space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Total Videos</span>
+                    <h3 id="statTotalVideos" class="text-xl font-extrabold text-white mt-1">200</h3>
+                </div>
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Published</span>
+                    <h3 id="statPublishedVideos" class="text-xl font-extrabold text-emerald-400 mt-1">195</h3>
+                </div>
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Draft / Private</span>
+                    <h3 id="statDraftVideos" class="text-xl font-extrabold text-amber-400 mt-1">5</h3>
+                </div>
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Total Views</span>
+                    <h3 id="statTotalViews" class="text-xl font-extrabold text-cyan-400 mt-1">1.2M</h3>
+                </div>
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Total Ad Slots</span>
+                    <h3 id="statTotalAds" class="text-xl font-extrabold text-purple-400 mt-1">5</h3>
+                </div>
+                <div class="bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                    <span class="text-[11px] text-gray-400 font-medium uppercase">Active Ads</span>
+                    <h3 id="statActiveAds" class="text-xl font-extrabold text-pink-400 mt-1">4</h3>
+                </div>
+            </div>
+
+            <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border space-y-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Quick Management Actions
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <button onclick="openUploadModal()" class="p-4 rounded-xl bg-dark-card border border-dark-border hover:border-brand-primary text-left transition space-y-1">
+                        <i class="fa-solid fa-upload text-brand-primary text-lg"></i>
+                        <h4 class="font-bold text-white">Upload Video</h4>
+                        <p class="text-gray-400 text-[11px]">Add local file or web link</p>
+                    </button>
+                    <button onclick="openAdModal()" class="p-4 rounded-xl bg-dark-card border border-dark-border hover:border-brand-primary text-left transition space-y-1">
+                        <i class="fa-solid fa-rectangle-ad text-brand-accent text-lg"></i>
+                        <h4 class="font-bold text-white">New Ad Slot</h4>
+                        <p class="text-gray-400 text-[11px]">Configure Adastra snippet</p>
+                    </button>
+                    <button onclick="switchAdminTab('videos')" class="p-4 rounded-xl bg-dark-card border border-dark-border hover:border-brand-primary text-left transition space-y-1">
+                        <i class="fa-solid fa-sliders text-emerald-400 text-lg"></i>
+                        <h4 class="font-bold text-white">Manage Videos</h4>
+                        <p class="text-gray-400 text-[11px]">Edit metadata & slider position</p>
+                    </button>
+                    <button onclick="switchAdminTab('settings')" class="p-4 rounded-xl bg-dark-card border border-dark-border hover:border-brand-primary text-left transition space-y-1">
+                        <i class="fa-solid fa-key text-purple-400 text-lg"></i>
+                        <h4 class="font-bold text-white">Security Settings</h4>
+                        <p class="text-gray-400 text-[11px]">Update Admin Access PIN</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminTabVideos" class="admin-tab-content hidden space-y-4">
+            <div class="bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl">
+                <div class="p-4 border-b border-dark-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="relative w-full sm:w-80">
+                        <input type="text" id="adminTableSearch" oninput="renderAdminTable()" placeholder="Search title, category, status..." class="w-full bg-dark-card text-xs text-gray-200 rounded-lg pl-8 pr-3 py-2 border border-dark-border focus:outline-none focus:border-brand-primary">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="text-gray-400">Filter Status:</span>
+                        <select id="adminStatusFilter" onchange="renderAdminTable()" class="bg-dark-card text-gray-200 rounded-lg px-2.5 py-1.5 border border-dark-border focus:outline-none">
+                            <option value="all">All Statuses</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-gray-300">
+                        <thead class="bg-dark-card uppercase tracking-wider text-[11px] text-gray-400 border-b border-dark-border">
+                            <tr>
+                                <th class="py-3 px-4">Preview</th>
+                                <th class="py-3 px-4">Title</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Views</th>
+                                <th class="py-3 px-4">Duration</th>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-dark-border/50">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminTabAds" class="admin-tab-content hidden space-y-4">
+            <div id="adServerNote" class="hidden text-[11px] rounded-xl border px-3 py-2"></div>
+            <div class="flex items-center justify-between bg-dark-surface p-4 rounded-2xl border border-dark-border">
+                <div>
+                    <h3 class="text-sm font-bold text-white">Adastra Advertisement Slots</h3>
+                    <p class="text-xs text-gray-400">Paste Adastra JS/HTML ad codes. They show instantly in <b>this browser</b>. To make them live for <b>all visitors</b>: click <b>Export ads-config.js</b>, then upload that file into the <code>js/</code> folder on your hosting (replace the old one). For Social Bar / Popunder scripts, refresh the page after changes.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <button onclick="exportAdsConfig()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 px-4 rounded-xl shadow flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-file-export"></i> Export ads-config.js
+                    </button>
+                    <button onclick="openAdModal()" class="bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold py-2 px-4 rounded-xl shadow flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-plus"></i> Add Ad Slot
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-gray-300">
+                        <thead class="bg-dark-card uppercase tracking-wider text-[11px] text-gray-400 border-b border-dark-border">
+                            <tr>
+                                <th class="py-3 px-4">Slot Name</th>
+                                <th class="py-3 px-4">Type</th>
+                                <th class="py-3 px-4">Position / Detail</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAdsTableBody" class="divide-y divide-dark-border/50">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminTabSettings" class="admin-tab-content hidden space-y-6">
+            <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border max-w-xl space-y-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-key text-brand-primary"></i> Admin Access PIN Settings
+                </h3>
+                <p class="text-xs text-gray-400">Update the 4-digit security PIN used to authenticate Admin Portal access.</p>
+                <form onsubmit="handlePinChange(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label for="currentPinInput" class="block font-medium text-gray-300 mb-1">Current PIN</label>
+                        <input type="password" id="currentPinInput" maxlength="10" required class="w-full bg-dark-card text-white rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="newPinInput" class="block font-medium text-gray-300 mb-1">New PIN</label>
+                        <input type="password" id="newPinInput" maxlength="10" required class="w-full bg-dark-card text-white rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                    <button type="submit" class="bg-brand-primary hover:bg-brand-hover text-white font-semibold py-2 px-4 rounded-xl transition">
+                        Update Admin PIN
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-dark-surface p-6 rounded-2xl border border-dark-border max-w-xl space-y-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-toggle-on text-brand-accent"></i> Global Advertisement Control
+                </h3>
+                <div class="flex items-center justify-between text-xs py-2 border-b border-dark-border">
+                    <div>
+                        <span class="font-bold text-white block">Enable Global Ads</span>
+                        <span class="text-gray-400 text-[11px]">Master toggle for all advertisement containers</span>
+                    </div>
+                    <input type="checkbox" id="globalAdsToggle" onchange="toggleGlobalAds(this.checked)" class="w-5 h-5 accent-brand-primary cursor-pointer">
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="videoModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/95 p-2 sm:p-4 md:p-6">
+        <div class="relative w-full max-w-5xl bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
+
+            <div class="flex items-center justify-between px-4 py-3 border-b border-dark-border bg-dark-card">
+                <div class="flex items-center gap-2 text-xs text-brand-accent font-semibold uppercase tracking-wider">
+                    <span id="modalCategoryBadge" class="bg-brand-primary/20 text-brand-primary border border-brand-primary/30 px-2.5 py-0.5 rounded-full">Category</span>
+                    <span id="modalViewsText" class="text-gray-400 font-normal">12.5k views</span>
+                    <span id="modalDownloadsText" class="text-gray-400 font-normal"></span>
+                </div>
+                <button onclick="closeVideoModal()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full hover:bg-dark-hover flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="relative w-full bg-black aspect-video flex items-center justify-center overflow-hidden">
+                <video id="mainVideoPlayer" controls controlsList="nodownload" class="w-full h-full object-contain focus:outline-none">
+                    <source id="videoSource" src="" type="video/mp4">
+                    Your browser does not support the HTML5 video player.
+                </video>
+                <div id="playerAdOverlay" class="hidden absolute inset-0 z-30 bg-black/95 flex flex-col items-center justify-center gap-2 p-3 text-center overflow-auto">
+                    <div class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Advertisement</div>
+                    <div id="playerAdHost" class="w-full max-w-full flex flex-col items-center gap-2 overflow-hidden"></div>
+                    <button id="playerAdCloseBtn" type="button" disabled onclick="closePlayerAd()" class="text-xs text-gray-400 py-2 px-4 opacity-50 cursor-not-allowed">Close in <span id="playerAdCountdown">5</span>s</button>
+                    <p class="text-[10px] text-gray-400">Close the ad to continue watching.</p>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-4 flex-grow">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-dark-border/60 pb-4">
+                    <div>
+                        <h2 id="modalVideoTitle" class="text-lg sm:text-xl font-bold text-white tracking-wide">Video Title Placeholder</h2>
+                        <p id="modalVideoDate" class="text-xs text-gray-400 mt-1">Uploaded Oct 2026</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <button id="prevVideoModalBtn" onclick="playPrevModalVideo()" class="bg-dark-card hover:bg-dark-hover text-gray-200 text-xs font-semibold py-2 px-3 rounded-lg border border-dark-border flex items-center gap-1 transition">
+                            <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+                        </button>
+                        <button id="nextVideoModalBtn" onclick="playNextModalVideo()" class="bg-dark-card hover:bg-dark-hover text-gray-200 text-xs font-semibold py-2 px-3 rounded-lg border border-dark-border flex items-center gap-1 transition">
+                            Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                        <button onclick="openSharePanel()" class="bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold py-2 px-3 rounded-lg shadow flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-share-nodes"></i> Share
+                        </button>
+                        <button id="modalDownloadBtn" onclick="downloadCurrentVideo()" class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-wait text-white text-xs font-semibold py-2 px-3 rounded-lg shadow flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-download"></i> <span id="modalDownloadLabel">Download</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="modalDownloadProgress" class="hidden">
+                    <div class="flex items-center justify-between text-[11px] text-gray-300 mb-1">
+                        <span><i class="fa-solid fa-download text-emerald-400 mr-1"></i>Downloading...</span>
+                        <span id="modalDownloadPct">0%</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-dark-card rounded-full overflow-hidden">
+                        <div id="modalDownloadBar" class="h-full bg-emerald-500 rounded-full transition-all duration-200" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Description</h4>
+                    <p id="modalVideoDescription" class="text-sm text-gray-300 leading-relaxed">Video description content goes here.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="uploadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="relative w-full max-w-xl bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-dark-border pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-brand-primary"></i> Upload & Add New Video
+                </h3>
+                <button onclick="closeUploadModal()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="uploadForm" onsubmit="handleUploadSubmit(event)" class="space-y-4">
+                <div>
+                    <label for="uploadTitle" class="block text-xs font-semibold text-gray-300 mb-1">Video Title *</label>
+                    <input type="text" id="uploadTitle" required placeholder="e.g. Modern Web Development Tutorial 2026" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Video Source *</label>
+                    <div class="grid grid-cols-2 gap-2 bg-dark-card p-1 rounded-xl border border-dark-border text-xs">
+                        <button type="button" id="tabSourceFile" onclick="switchUploadTab('file')" class="py-2 px-3 rounded-lg font-semibold bg-brand-primary text-white transition">
+                            <i class="fa-solid fa-file-video mr-1"></i> Computer File
+                        </button>
+                        <button type="button" id="tabSourceUrl" onclick="switchUploadTab('url')" class="py-2 px-3 rounded-lg font-semibold text-gray-400 hover:text-white transition">
+                            <i class="fa-solid fa-link mr-1"></i> Paste Video URL
+                        </button>
+
+                    </div>
+                </div>
+
+                <div id="fileUploadContainer">
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Select Video File (.mp4, .webm, .mov) *</label>
+                    <div class="border-2 border-dashed border-dark-border hover:border-brand-primary rounded-xl p-4 text-center cursor-pointer bg-dark-card transition" onclick="document.getElementById('videoFileInput').click()">
+                        <i class="fa-solid fa-file-video text-2xl text-brand-primary mb-1"></i>
+                        <p id="videoFileLabel" class="text-xs text-gray-300 font-medium">Click or drag video file here to attach</p>
+                        <span class="text-[10px] text-gray-500">Local video files will play directly in your browser!</span>
+                        <input type="file" id="videoFileInput" accept="video/mp4,video/webm,video/quicktime,video/mkv" class="hidden" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+
+                <div id="urlUploadContainer" class="hidden">
+                    <label for="uploadVideoUrl" class="block text-xs font-semibold text-gray-300 mb-1">Direct Streamable Video URL (.mp4) *</label>
+                    <input type="url" id="uploadVideoUrl" placeholder="https://commondatastorage.googleapis.com/.../file.mp4" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="uploadCategory" class="block text-xs font-semibold text-gray-300 mb-1">Category *</label>
+                        <select id="uploadCategory" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                            <option value="Technology">Technology</option>
+                            <option value="Featured">Featured</option>
+                            <option value="Action">Action</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Documentary">Documentary</option>
+                            <option value="Music">Music</option>
+                            <option value="Sports">Sports</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="uploadDuration" class="block text-xs font-semibold text-gray-300 mb-1">Duration *</label>
+                        <input type="text" id="uploadDuration" placeholder="e.g. 05:30" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="uploadThumbnailUrl" class="block text-xs font-semibold text-gray-300 mb-1">Thumbnail Image URL (Optional)</label>
+                    <input type="url" id="uploadThumbnailUrl" placeholder="https://images.unsplash.com/..." class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                </div>
+
+                <div class="flex items-center gap-2 bg-dark-card p-3 rounded-xl border border-dark-border">
+                    <input type="checkbox" id="uploadAllowDownload" checked class="w-4 h-4 accent-brand-primary rounded cursor-pointer">
+                    <label for="uploadAllowDownload" class="text-xs font-semibold text-white cursor-pointer"><i class="fa-solid fa-download text-emerald-400 mr-1"></i> Allow visitors to download this video</label>
+                </div>
+
+                <div class="rounded-xl border border-dark-border bg-dark-card p-3 space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="uploadFeatured" onchange="toggleUploadSlideshow()" class="w-4 h-4 accent-brand-primary rounded cursor-pointer">
+                        <span class="text-xs font-semibold text-white"><i class="fa-solid fa-star text-amber-400 mr-1"></i> Show this video in the homepage slideshow</span>
+                    </label>
+                    <div id="uploadSlidePosWrap" class="hidden space-y-1">
+                        <label for="uploadSliderPosition" class="block text-[11px] font-semibold text-gray-300">Which slide?</label>
+                        <select id="uploadSliderPosition" class="w-full bg-dark-surface text-xs text-gray-100 rounded-lg p-2 border border-dark-border focus:border-brand-primary focus:outline-none"></select>
+                        <p class="text-[10px] text-gray-400">The new video takes this slide. The video already there and the ones after it move down one place (slideshow holds 5 slides).</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="uploadDescription" class="block text-xs font-semibold text-gray-300 mb-1">Description</label>
+                    <textarea id="uploadDescription" rows="2" placeholder="Provide a summary..." class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none"></textarea>
+                </div>
+
+                <div id="uploadProgressContainer" class="hidden space-y-1">
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>Uploading file...</span>
+                        <span id="uploadPercentText">0%</span>
+                    </div>
+                    <div class="w-full bg-dark-card h-2 rounded-full overflow-hidden">
+                        <div id="uploadProgressBar" class="bg-gradient-to-r from-brand-primary to-brand-accent h-full w-0 transition-all duration-200"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 border-t border-dark-border pt-4">
+                    <button type="button" onclick="closeUploadModal()" class="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white rounded-lg">Cancel</button>
+                    <button type="submit" id="submitUploadBtn" class="bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold py-2.5 px-6 rounded-xl shadow transition">
+                        Submit & Publish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/85 p-4">
+        <div class="relative w-full max-w-2xl bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl p-6 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-dark-border pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit Video Details
+                </h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="editForm" onsubmit="handleEditSubmit(event)" class="space-y-4">
+                <input type="hidden" id="editVideoId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="editTitle" class="block text-xs font-semibold text-gray-300 mb-1">Video Title *</label>
+                        <input type="text" id="editTitle" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="editCategory" class="block text-xs font-semibold text-gray-300 mb-1">Category *</label>
+                        <select id="editCategory" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                            <option value="Technology">Technology</option>
+                            <option value="Featured">Featured</option>
+                            <option value="Action">Action</option>
+                            <option value="Comedy">Comedy</option>
+                            <option value="Documentary">Documentary</option>
+                            <option value="Music">Music</option>
+                            <option value="Sports">Sports</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label for="editStatus" class="block text-xs font-semibold text-gray-300 mb-1">Publication Status *</label>
+                        <select id="editStatus" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="editDuration" class="block text-xs font-semibold text-gray-300 mb-1">Duration *</label>
+                        <input type="text" id="editDuration" required class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="editViews" class="block text-xs font-semibold text-gray-300 mb-1">Views Count</label>
+                        <input type="number" id="editViews" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="editTags" class="block text-xs font-semibold text-gray-300 mb-1">Tags (Comma separated)</label>
+                        <input type="text" id="editTags" placeholder="action, 4k, trending" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                    </div>
+                    <div class="flex items-center gap-2 bg-dark-card p-2.5 rounded-lg border border-dark-border">
+                        <input type="checkbox" id="editAllowDownload" checked class="w-4 h-4 accent-brand-primary rounded cursor-pointer">
+                        <label for="editAllowDownload" class="text-xs font-semibold text-white cursor-pointer"><i class="fa-solid fa-download text-emerald-400 mr-1"></i> Allow visitors to download</label>
+                    </div>
+                    <div class="flex items-center gap-4 bg-dark-card p-2.5 rounded-lg border border-dark-border">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="editFeatured" class="w-4 h-4 accent-brand-primary rounded cursor-pointer">
+                            <label for="editFeatured" class="text-xs font-semibold text-white cursor-pointer">Hero Featured</label>
+                        </div>
+                        <div class="flex-1">
+                            <select id="editSliderPosition" class="w-full bg-dark-surface text-xs text-gray-100 rounded p-1 border border-dark-border">
+                                <option value="1">Pos 1</option>
+                                <option value="2">Pos 2</option>
+                                <option value="3">Pos 3</option>
+                                <option value="4">Pos 4</option>
+                                <option value="5">Pos 5</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="editThumbnailUrl" class="block text-xs font-semibold text-gray-300 mb-1">Thumbnail Image URL</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="editThumbnailUrl" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                        <button type="button" id="editCaptureThumbBtn" onclick="captureEditThumbnail()" class="bg-dark-hover hover:bg-dark-border text-gray-100 text-xs font-semibold px-3 py-2.5 rounded-lg border border-dark-border transition whitespace-nowrap flex items-center gap-1.5" title="Take the thumbnail from a frame of this video">
+                            <i class="fa-solid fa-camera"></i> Capture from video
+                        </button>
+                    </div>
+                </div>
+ <div>
+    <label for="editVideoUrl" class="block text-xs font-semibold text-gray-300 mb-1">Video Source URL / Blob</label>
+    <div class="flex items-center gap-2">
+        <input type="text" id="editVideoUrl" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+        <button type="button" onclick="document.getElementById('editVideoFileInput').click()" class="bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition whitespace-nowrap flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-folder-open"></i> Browse PC
+        </button>
+    </div>
+    <input type="file" id="editVideoFileInput" accept="video/mp4,video/webm,video/quicktime,video/mkv" class="hidden" onchange="handleEditFileSelect(event)">
+</div>
+
+                <div>
+                    <label for="editDescription" class="block text-xs font-semibold text-gray-300 mb-1">Description</label>
+                    <textarea id="editDescription" rows="3" class="w-full bg-dark-card text-xs text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none"></textarea>
+                </div>
+
+                <!-- Video Preview Section: the homepage card, with the player inside -->
+                <div id="editPreviewSection" class="rounded-xl border border-dark-border bg-dark-card/40 p-3 sm:p-4">
+                    <div class="flex items-center justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-8 h-8 rounded-lg bg-brand-primary/15 text-brand-primary flex items-center justify-center text-sm shrink-0">
+                                <i class="fa-solid fa-clapperboard"></i>
+                            </span>
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-white leading-tight">Video Preview</h4>
+                                <p class="text-[10px] text-gray-400 truncate">Same card as the homepage. Updates live as you edit.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span id="editPreviewBadge" class="preview-badge" data-state="empty">
+                                <span class="preview-badge-dot"></span>
+                                <span id="editPreviewBadgeText">No video</span>
+                            </span>
+                            <button type="button" id="editPreviewOpenBtn" onclick="openEditPreviewInTab()" class="preview-icon-btn" title="Open in new tab" disabled>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </button>
+                            <button type="button" id="editPreviewClearBtn" onclick="clearEditPreview()" class="preview-icon-btn preview-icon-btn-danger" title="Remove video" disabled>
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Homepage card -->
+                    <div class="preview-card-wrap">
+                        <div id="editPreviewCard" class="glass-card rounded-2xl overflow-hidden border border-dark-border flex flex-col justify-between">
+                            <div>
+                                <div class="relative aspect-video overflow-hidden bg-dark-card">
+                                    <!-- Player (shown after pressing play) -->
+                                    <video id="editVideoPreview" controls playsinline preload="metadata" class="absolute inset-0 w-full h-full object-contain bg-black z-10"></video>
+
+                                    <!-- Card thumbnail layer (what the homepage shows) -->
+                                    <div id="editCardThumbLayer" class="preview-thumb-layer absolute inset-0 z-20" onclick="playEditPreview()">
+                                        <img id="editCardThumb" alt="" class="w-full h-full object-cover">
+                                        <div class="preview-play-wrap absolute inset-0 flex items-center justify-center">
+                                            <div class="preview-play-btn">
+                                                <i class="fa-solid fa-play ml-0.5"></i>
+                                            </div>
+                                        </div>
+                                        <span id="editCardDuration" class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded backdrop-blur-sm">00:00</span>
+                                        <span id="editCardCategory" class="absolute top-2 left-2 bg-brand-primary/90 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Category</span>
+                                    </div>
+
+                                    <!-- Empty state -->
+                                    <div id="editPreviewPlaceholder" class="preview-overlay">
+                                        <div class="preview-empty-icon"><i class="fa-solid fa-play"></i></div>
+                                        <p class="text-sm font-semibold text-gray-200 mt-3">No video selected</p>
+                                        <p class="text-[11px] text-gray-400 mt-1 max-w-xs text-center px-4">Paste a video URL above or choose a file from your computer.</p>
+                                        <button type="button" onclick="document.getElementById('editVideoFileInput').click()" class="mt-3 inline-flex items-center gap-1.5 bg-brand-primary/90 hover:bg-brand-primary text-white text-[11px] font-semibold px-3.5 py-2 rounded-lg transition shadow">
+                                            <i class="fa-solid fa-folder-open"></i> Browse PC
+                                        </button>
+                                    </div>
+
+                                    <!-- Loading state -->
+                                    <div id="editPreviewLoading" class="preview-overlay hidden">
+                                        <div class="preview-spinner"></div>
+                                        <p class="text-[11px] font-medium text-gray-300 mt-3">Loading preview&hellip;</p>
+                                    </div>
+
+                                    <!-- Error state -->
+                                    <div id="editPreviewError" class="preview-overlay hidden">
+                                        <div class="preview-empty-icon preview-empty-icon-error"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                        <p class="text-sm font-semibold text-gray-200 mt-3">Couldn&rsquo;t load this video</p>
+                                        <p class="text-[11px] text-gray-400 mt-1 max-w-xs text-center px-4">Check the URL or try another file. MP4 or WebM works best.</p>
+                                        <button type="button" onclick="retryEditPreview()" class="mt-3 inline-flex items-center gap-1.5 bg-dark-hover hover:bg-dark-border text-gray-100 text-[11px] font-semibold px-3.5 py-2 rounded-lg border border-dark-border transition">
+                                            <i class="fa-solid fa-rotate-right"></i> Try again
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 space-y-1.5">
+                                    <h3 id="editCardTitle" class="text-sm font-bold text-white line-clamp-2">Untitled video</h3>
+                                    <p id="editCardDesc" class="text-xs text-gray-400 line-clamp-2 preview-card-desc" title="Click to expand / collapse">No description added yet.</p>
+                                </div>
+                            </div>
+                            <div class="px-4 pb-4 pt-1 flex items-center justify-between text-[11px] text-gray-400 border-t border-dark-border/40 mt-2">
+                                <span><i class="fa-solid fa-eye text-brand-accent mr-1"></i><span id="editCardViews">0</span> views</span>
+                                <span id="editCardDate">&mdash;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Local file note -->
+                    <p id="editLocalNote" class="preview-note hidden">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Local files only play in this browser session. For a permanent video, use a hosted URL.
+                    </p>
+
+                    <!-- Listing info: status, hero, tags, visibility -->
+                    <div id="editPreviewDetails" class="preview-details">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span id="editDetStatus" class="preview-chip preview-chip-status" data-status="published">Published</span>
+                            <span id="editDetHero" class="preview-chip preview-chip-hero hidden"><i class="fa-solid fa-star"></i> <span id="editDetHeroText">Hero</span></span>
+                        </div>
+                        <div id="editDetTags" class="flex flex-wrap gap-1.5 hidden"></div>
+                        <div id="editDetVisibility" class="preview-visibility" data-state="live">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span id="editDetVisibilityText">Live on the homepage</span>
+                        </div>
+                    </div>
+
+                    <!-- File info -->
+                    <div class="grid grid-cols-3 gap-2 mt-3">
+                        <div class="preview-meta-tile">
+                            <span class="preview-meta-label"><i class="fa-solid fa-expand"></i> Quality</span>
+                            <span id="editMetaQuality" class="preview-meta-value">&mdash;</span>
+                        </div>
+                        <div class="preview-meta-tile">
+                            <span class="preview-meta-label"><i class="fa-solid fa-link"></i> Source</span>
+                            <span id="editMetaSource" class="preview-meta-value">&mdash;</span>
+                        </div>
+                        <div class="preview-meta-tile">
+                            <span class="preview-meta-label"><i class="fa-solid fa-stopwatch"></i> Detected length</span>
+                            <span id="editMetaDetected" class="preview-meta-value">&mdash;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 border-t border-dark-border pt-4">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold py-2 px-5 rounded-xl shadow transition">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="relative w-full max-w-xl bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-dark-border pb-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-rectangle-ad text-brand-primary"></i> Create / Edit Adastra Ad Slot
+                </h3>
+                <button onclick="closeAdModal()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="adForm" onsubmit="handleAdSubmit(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="adSlotId">
+                <div>
+                    <label for="adName" class="block font-semibold text-gray-300 mb-1">Ad Slot Name *</label>
+                    <input type="text" id="adName" required placeholder="e.g. Header 728x90 Banner" class="w-full bg-dark-card text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="adType" class="block font-semibold text-gray-300 mb-1">Ad Type *</label>
+                        <select id="adType" required onchange="syncAdPositionToType()" class="w-full bg-dark-card text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                            <option value="socialbar">Social Bar</option>
+                            <option value="popunder">Popunder</option>
+                            <option value="native">Native Banner</option>
+                            <option value="banner_728x90">Banner 728x90</option>
+                            <option value="banner_320x50">Banner 320x50</option>
+                            <option value="banner_468x60">Banner 468x60</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="adPosition" class="block font-semibold text-gray-300 mb-1">Position / Placement</label>
+                        <select id="adPosition" onchange="adPositionChanged()" class="w-full bg-dark-card text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none ">
+                            <option value="top">Top Header</option>
+                            <option value="bottom">Bottom Fixed</option>
+                            <option value="player">Video Player (3s, 15s, 30s, 1m, 2m)</option>
+                            <option value="content_2">After 2th Video</option>
+                            <option value="content_4">After 4th Video</option>
+                            <option value="content_6">After 6th Video</option>
+                            <option value="content_8">After 8th Video</option>
+                            <option value="content_10">After 10th Video</option>
+                            <option value="content_12">After 12th Video</option>
+                            <option value="content_16">After 16th Video</option>
+                            <option value="content_20">After 20th Video</option>
+                            <option value="content_24">After 24th Video</option>
+                            <option value="content_30">After 30th Video</option>
+                            <option value="content_36">After 36th Video</option>
+                            <option value="content_custom">After Nth video (type a number)...</option>
+                                                    </select>
+                        <div id="adPositionCustomWrap" class="hidden mt-2">
+                            <input type="number" id="adPositionCustom" min="1" max="500" step="1" placeholder="Video number, e.g. 8" class="w-full bg-dark-card text-gray-100 rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="adCode" class="block font-semibold text-gray-300 mb-1">Adastra HTML / JS Code Tag *</label>
+                    <textarea id="adCode" rows="5" placeholder="Paste Adastra script or HTML code here..." required class="w-full bg-dark-card text-gray-100 font-mono text-[11px] rounded-lg p-2.5 border border-dark-border focus:border-brand-primary focus:outline-none"></textarea>
+                    <p class="text-[10px] text-gray-400 mt-1.5 leading-relaxed">Paste the full snippet exactly as given (including every &lt;script&gt; tag). Choose any placement. <b>Popunder</b> is script-only: it runs on the page whatever the placement. <b>Video Player</b>: this ad covers the player after 3s, 15s, 30s, 1 min and 2 min of watching, and the video continues only after the visitor closes it.</p>
+                </div>
+
+                <div class="flex items-center justify-between bg-dark-card p-3 rounded-lg border border-dark-border">
+                    <span class="font-semibold text-white">Slot Enabled</span>
+                    <input type="checkbox" id="adEnabled" checked class="w-5 h-5 accent-brand-primary cursor-pointer">
+                </div>
+
+                <div class="flex items-center justify-end space-x-3 border-t border-dark-border pt-4">
+                    <button type="button" onclick="closeAdModal()" class="px-4 py-2 font-semibold text-gray-400 hover:text-white rounded-lg">Cancel</button>
+
+                    <button type="submit" class="bg-brand-primary hover:bg-brand-hover text-white font-semibold py-2 px-5 rounded-xl shadow transition">Save Ad Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminPinModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+        <div class="relative w-full max-w-sm bg-dark-surface rounded-2xl border border-dark-border overflow-hidden shadow-2xl p-6 text-center space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-brand-primary/20 text-brand-primary border border-brand-primary/30 flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-extrabold text-white">Admin Authentication</h3>
+                <p class="text-xs text-gray-400 mt-1">Enter Security PIN to access Admin Portal. (Default: <strong>1234</strong>)</p>
+            </div>
+            <form onsubmit="handlePinSubmit(event)" class="space-y-3">
+                <input type="password" id="adminPinInput" maxlength="10" placeholder="Enter PIN" required class="w-full text-center tracking-widest text-lg font-bold bg-dark-card text-white rounded-xl p-3 border border-dark-border focus:border-brand-primary focus:outline-none">
+                <button type="submit" class="w-full bg-brand-primary hover:bg-brand-hover text-white font-bold py-3 rounded-xl shadow transition text-xs">Unlock Admin Portal</button>
+            </form>
+            <button onclick="closeAdminPinModal()" class="text-xs text-gray-500 hover:text-gray-300">Cancel & Return to Site</button>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="relative w-full max-w-sm bg-dark-surface rounded-2xl border border-red-500/30 overflow-hidden shadow-2xl p-6 space-y-4 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Confirm Deletion</h3>
+            <p id="deleteConfirmText" class="text-xs text-gray-300">Are you sure you want to delete this item? This action cannot be undone.</p>
+            <div class="flex items-center justify-center space-x-3 pt-2">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white">Cancel</button>
+                <button id="confirmDeleteBtn" onclick="executeDeleteAction()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2 px-5 rounded-xl shadow transition">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="popupAdModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div id="ad-popup" class="relative w-auto max-w-[95vw] max-h-[90vh] overflow-auto bg-dark-surface border border-dark-border rounded-2xl p-5 shadow-2xl space-y-3 text-center">
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Advertisement</div>
+            <div id="adPopupHost" class="flex flex-col items-center gap-3 overflow-hidden"></div>
+            <button id="closePopupAdBtn" disabled onclick="dismissPopupAd()" class="text-xs text-gray-400 hover:text-white py-2 px-4 opacity-50 cursor-not-allowed">
+                Close in <span id="popupAdCountdown">5</span>s
+            </button>
+        </div>
+    </div>
+
+    <div id="bottomSocialBar" class="hidden fixed bottom-0 inset-x-0 z-30 bg-dark-card/95 backdrop-blur-md border-t border-dark-border py-2 px-4 shadow-2xl transition-transform duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs">
+            <div id="adBottomHost" class="flex-1 w-full min-w-0 flex flex-col items-center gap-2 overflow-hidden"></div>
+            <button onclick="dismissSocialBar()" class="text-gray-400 hover:text-white p-1 shrink-0" title="Close Bar">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="shareModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/85 p-4" onclick="if(event.target===this)closeSharePanel()">
+        <div class="relative w-full max-w-md bg-dark-surface rounded-2xl border border-dark-border shadow-2xl p-5 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-share-nodes text-brand-primary"></i> Share this video</h3>
+                <button onclick="closeSharePanel()" class="text-gray-400 hover:text-white w-8 h-8 rounded-full hover:bg-dark-hover flex items-center justify-center transition" title="Close"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="rounded-xl overflow-hidden border border-dark-border bg-dark-card">
+                <div class="relative aspect-video bg-black overflow-hidden">
+                    <img id="sharePreviewImg" alt="" class="absolute inset-0 w-full h-full object-cover">
+                    <video id="sharePreviewVideo" muted loop playsinline preload="none" class="absolute inset-0 w-full h-full object-cover" style="opacity:0;transition:opacity .3s"></video>
+                    <button type="button" id="sharePreviewPlay" onclick="toggleSharePreview()" class="absolute inset-0 flex items-center justify-center bg-black/25 hover:bg-black/40 transition" title="Play preview">
+                        <span class="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-play ml-0.5"></i></span>
+                    </button>
+                    <span id="sharePreviewDuration" class="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded pointer-events-none">00:00</span>
+                </div>
+                <div class="p-3">
+                    <h4 id="sharePreviewTitle" class="text-sm font-bold text-white line-clamp-2">Video title</h4>
+                    <p id="sharePreviewMeta" class="text-[11px] text-gray-400 mt-0.5"></p>
+                </div>
+            </div>
+
+            <div id="shareNote" class="hidden text-[11px] leading-relaxed rounded-lg border px-3 py-2"></div>
+
+            <div class="flex items-center gap-2">
+                <input id="shareLinkInput" type="text" readonly onclick="this.select()" class="w-full bg-dark-card text-xs text-gray-200 rounded-lg p-2.5 border border-dark-border focus:outline-none">
+                <button type="button" onclick="copyShareLink()" class="bg-brand-primary hover:bg-brand-hover text-white text-xs font-semibold px-3.5 py-2.5 rounded-lg transition whitespace-nowrap flex items-center gap-1.5"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+
+            <div id="shareIcons" class="grid grid-cols-4 gap-x-2 gap-y-4 pt-1"></div>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="fixed bottom-16 right-5 z-50 hidden bg-dark-card border border-brand-primary text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-brand-accent text-sm"></i>
+        <span id="toastText">Action completed successfully.</span>
+        <button type="button" id="toastAction" class="hidden text-brand-accent hover:text-white font-semibold whitespace-nowrap underline underline-offset-2"></button>
+    </div>
+
+    <script src="js/ads-config.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
