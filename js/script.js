@@ -670,7 +670,7 @@
             if (heroBg) heroBg.style.backgroundImage = 'url("' + String(getThumb(video)).replace(/"/g, '%22') + '")';
 
             // real video preview behind the gradients (muted, looping); falls back to the thumbnail on error
-            if (heroBg && isPlaceholderThumb(video) && frameSrc(video) && !isVideoModalOpen()) {
+            if (heroBg && frameSrc(video) && !isVideoModalOpen()) {   // every slide plays its real video, whatever its thumbnail is
                 const hv = document.createElement('video');
                 hv.className = 'hero-frame absolute inset-0 w-full h-full object-cover pointer-events-none';
                 hv.muted = true; hv.loop = true; hv.playsInline = true; hv.preload = 'metadata';   // not 'auto': do not pull the whole file
@@ -682,6 +682,7 @@
                     const p = hv.play(); if (p && p.catch) p.catch(function () {});
                 });
                 hv.addEventListener('error', function () { hv.remove(); });
+                hv.setAttribute('muted', ''); hv.setAttribute('autoplay', '');
                 hv.src = frameSrc(video);
                 heroBg.insertAdjacentElement('afterend', hv);
             }
